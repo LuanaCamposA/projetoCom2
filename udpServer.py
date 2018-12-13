@@ -82,7 +82,7 @@ def clientCom():
             for x in datas:
                 nomes += bytes(x["nome"], "utf-8")
                 nomes += b' '
-                sock.sendto(bytes(nomes, "utf-8"), addr)
+            sock.sendto(nomes, addr)
                 
 
         elif sentence.decode()[:7] == "ARQUIVO" :
@@ -90,7 +90,7 @@ def clientCom():
             for x in datas:
                 if sentence.decode()[8:] == x["nome"] :
                     response = bytes(x["descricao"], "utf-8")
-            sock.sendto(bytes(response, "utf-8"), addr)                    
+            sock.sendto(response, addr)                    
                                 
 
         elif sentence.decode() == "ENCERRAR":
