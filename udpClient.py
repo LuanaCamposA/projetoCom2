@@ -27,16 +27,30 @@ def tcpServerComunication(add):
 
     sockt =  socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-    
-                                                                                                                                   
+    # 0 --- 7 8 --- 15 16 --- 23 23 --- 31  
+    # numSeq    ACK        0          0  
+    # ------------------------------------
+    # ---------------DADOS----------------
+    # ------------------------------------
+
+
+
     while True:
         i=0
-        while i<=3 : 
+        numSeq = '1'
+        numExp =  str(int(numExp) + 1)
+        AKC = '0'
+        newResquest = numSeq + request
+
+        while i<3 : 
             try:
-                sockt.sendto(bytes(request, 'utf-8'), (serverName, serverPort))
+                sockt.sendto(bytes(newResquest, 'utf-8'), (serverName, serverPort))
                 sockt.settimeout(5.00)
                 dados, addr = sockt.recvfrom(1024)
-                i = 20000
+                if dados.decode()[0] == int(numExp):
+                    i = 3
+                else: 
+                    print('NumSeq errado...')
 
             except socket.timeout:
                 print('Pacote perdido')
