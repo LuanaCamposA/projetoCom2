@@ -1,10 +1,15 @@
 
 import socket
+import time
+import threading
 
 ####ESSE PROGRAMA RODA O CLIENTE; DEVE SER INICIALIZADO APÓS O DNS SERVER E O SERVIDOR.
 ###Na função, dnsServerComunication(), a variavel nomeDns deve ser setada com o IP da máquina que está rodando o código do dnsServer
 ### quando for solicitado o site, digite: "fb.com"
 ###Na função, tcpServerComunication() não é necessária nenhuma modificação;
+
+
+    
 
 ### faz a comunicação cliente/servidor -- vai ter que ser UDP
 def tcpServerComunication(add):
@@ -22,31 +27,40 @@ def tcpServerComunication(add):
 
     sockt =  socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-    #sockt.sendto(bytes(request, 'utf-8'), (serverName, serverPort))
+    
                                                                                                                                    
     while True:
-        
-        sockt.sendto(bytes(request, 'utf-8'), (serverName, serverPort))
-               
-        dados, addr = sockt.recvfrom(1024)      
-        
+        i=0
+        while i<=3 : 
+            try:
+                sockt.sendto(bytes(request, 'utf-8'), (serverName, serverPort))
+                sockt.settimeout(5.00)
+                dados, addr = sockt.recvfrom(1024)
+                i = 20000
+
+            except socket.timeout:
+                print('Pacote perdido')
+                i += 1
+
         if request == "ENCERRAR" :
             print('\n')    
             print(dados.decode())
-            print(f'Encerrando conexão com Servidor: {addr[0]}')
+            #print(f'Encerrando conexão com Servidor: {addr[0]}')
             sockt.close()
             break
         
         elif request == "LISTAR":
             print('\n')    
             print("Listando arquivos existentes...")
-            print('\n')    
             print(dados.decode())
+            print('\n')    
+
         
         elif request[:7] == "ARQUIVO":
             print('\n')    
-            print("Arquivo solicitado: \n")
+            print("Arquivo solicitado: ")
             print(dados.decode())
+            print('\n')    
 
         else:
             print(dados.decode())

@@ -1,4 +1,5 @@
 import socket, json
+import time 
 
 #####COMENTÁRIOS: ESTE PROGRAMA EXECUTA A FUNÇÃO DO SERVIDOR TCP E DEVE SER INICIALIZADO APÓS O DNS SERVER
 #### A variável "serverHost" deve conter o ip da máquina que está rodando o código
@@ -71,7 +72,8 @@ def clientCom():
         print('O que o cliente quer?')
         print(f'Cliente  {addr[0]} solicitando: {sentence.decode()}')
         
-        if not sentence: break        
+        if not sentence: break  
+         ##acho q pode tirar essa parte aqui             
         print(sentence.decode()[:7])
         print(sentence.decode()[8:])
                     
