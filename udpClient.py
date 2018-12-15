@@ -28,37 +28,42 @@ def tcpServerComunication(add):
     sockt =  socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     # 0 --- 7 8 --- 15 16 --- 23 23 --- 31  
-    # numSeq    ACK        0          0  
+    # numSeq   numExp     ACK    ---------  
     # ------------------------------------
     # ---------------DADOS----------------
     # ------------------------------------
 
-
+        
+    numSeq = 1
+    numExp = numSeq + 1
+    AKC = '0'
+    newResquest = str(numSeq) + str(numExp) + str(AKC) + request
 
     while True:
-        i=0
-        numSeq = '1'
-        numExp =  str(int(numExp) + 1)
-        AKC = '0'
-        newResquest = numSeq + request
-
-        while i<3 : 
+        tentar = 0
+        while tentar < 3 : 
             try:
-                sockt.sendto(bytes(newResquest, 'utf-8'), (serverName, serverPort))
-                sockt.settimeout(5.00)
+                sockt.sendto(bytes(newResquest, "utf-8"), (serverName, serverPort))
+                sockt.settimeout(2.00)
                 dados, addr = sockt.recvfrom(1024)
-                if dados.decode()[0] == int(numExp):
-                    i = 3
+                
+                print(f'numero de sequencia: {dados.decode()[0]}')
+                print(f'numero esperado: {dados.decode()[1]}')
+                print(f'ACK: {dados.decode()[2]}')            
+
+                if dados.decode()[2] == newResquest[1]:
+                    tentar = 3
                 else: 
                     print('NumSeq errado...')
+                    break
 
             except socket.timeout:
                 print('Pacote perdido')
-                i += 1
+                tentar += 1
 
         if request == "ENCERRAR" :
             print('\n')    
-            print(dados.decode())
+            print(dados.decode()[3:])
             #print(f'Encerrando conexão com Servidor: {addr[0]}')
             sockt.close()
             break
@@ -66,22 +71,27 @@ def tcpServerComunication(add):
         elif request == "LISTAR":
             print('\n')    
             print("Listando arquivos existentes...")
-            print(dados.decode())
+            print(dados.decode()[3:])
             print('\n')    
 
         
         elif request[:7] == "ARQUIVO":
             print('\n')    
             print("Arquivo solicitado: ")
-            print(dados.decode())
+            print(dados.decode()[3:])
             print('\n')    
 
         else:
-            print(dados.decode())
+            print(dados.decode()[3:])
 
                 
         print('Digite novo comando: \n')
         request = input()
+
+        numSeq = int(dados.decode()[2])
+        numExp = numSeq + 1
+        AKC = int(dados.decode()[1])
+        newResquest = str(numSeq) + str(numExp) + str(AKC) + request
 
 
 
@@ -90,7 +100,7 @@ def tcpServerComunication(add):
 #### dnsServerComunication() faz a comunicação cliente/dns ###
 def dnsServerComunication():
 
-    nomeDNS = '172.22.67.194' #LUANA
+    nomeDNS = '192.168.0.15' #LUANA
     portaDNS = 12000
 
     print('Digite site:')

@@ -6,7 +6,7 @@ import socket, json
 ###### a variável "serverHost" deve conter o ip da máquina que está rodando o código 
 
 
-serverHost = '172.22.67.194' #cin lua
+serverHost = '192.168.0.15' #cin lua
 serverPort1 = 12000
 
 dados = []                                              ###dados salva o domínio e o respectivo endereço do servidor

@@ -45,7 +45,7 @@ datas = [
 def dnsCom():
 
     while True:
-        nomeDNS = '172.22.67.194'
+        nomeDNS = '192.168.0.15'
         portaDNS = 12000
 
         print('Comunicando com DNS')
@@ -59,7 +59,7 @@ def dnsCom():
 
 ######### COMUNICAÇÃO COM O UDP CLIENT ##############
 def clientCom():
-    serverHost = '172.22.67.194' #cin lua
+    serverHost = '192.168.0.15' #cin lua
     serverPort = 12001
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -67,39 +67,55 @@ def clientCom():
 
     print ('--Nova conexão com Cliente UDP--')
 
+    numSeq = 5
+    numExp = numSeq + 1
+
     while True:
         sentence, addr = sock.recvfrom(1024)
         print('O que o cliente quer?')
-        print(f'Cliente  {addr[0]} solicitando: {sentence.decode()}')
+        print(f'Cliente  {addr[0]} solicitando: {sentence.decode()[3:]}')
         
         if not sentence: break  
-         ##acho q pode tirar essa parte aqui             
-        print(sentence.decode()[:7])
-        print(sentence.decode()[8:])
-                    
+         ##acho q pode tirar essa parte aqui 
+        print(f'numero de sequencia: {sentence.decode()[0]}')
+        print(f'numero esperado: {sentence.decode()[1]}')
+        print(f'ACK: {sentence.decode()[2]}')             
+
+        
+        AKC = sentence.decode()[1]
+        newResponse = str(numSeq) + str(numExp) + AKC
+        numSeq = int(sentence.decode()[2])
+        numExp = numSeq + 1
+        
         #DECODIFICAÇÃO DA SOLICITAÇÃO
         ####TA DANDO MERDA AQUI
-        if sentence.decode() == "LISTAR" :
+        if sentence.decode()[3:] == "LISTAR" :
             nomes = b''
             for x in datas:
                 nomes += bytes(x["nome"], "utf-8")
                 nomes += b' '
-            sock.sendto(nomes, addr)
+            newResponse = bytes(newResponse, "utf-8")
+            newResponse += nomes
+            sock.sendto(newResponse, addr)
                 
 
-        elif sentence.decode()[:7] == "ARQUIVO" :
+        elif sentence.decode()[3:10] == "ARQUIVO" :
             response = 'Arquivo nao encontrado'
             for x in datas:
-                if sentence.decode()[8:] == x["nome"] :
+                if sentence.decode()[11:] == x["nome"] :
                     response = bytes(x["descricao"], "utf-8")
-            sock.sendto(response, addr)                    
+            newResponse = bytes(newResponse, "utf-8")
+            newResponse += response
+            sock.sendto(newResponse, addr)                    
                                 
 
-        elif sentence.decode() == "ENCERRAR":
+        elif sentence.decode()[3:] == "ENCERRAR":
                 
                 response = 'Encerrada conexao com servidor'
                 print(f'encerrando conexão com cliente {addr}')
-                sock.sendto(bytes(response, "utf-8"), addr) 
+                newResponse += response
+                newResponse = bytes(newResponse, "utf-8")
+                sock.sendto(newResponse, addr) 
                 sock.close()
                 break
 
@@ -107,7 +123,9 @@ def clientCom():
         else:
             response = ''
             response = 'Operacao nao identificada pelo Servidor'
-            sock.sendto(bytes(response, "utf-8"), addr)
+            newResponse += response
+            newResponse = bytes(newResponse, "utf-8")
+            sock.sendto(newResponse, addr)
 
         
 
