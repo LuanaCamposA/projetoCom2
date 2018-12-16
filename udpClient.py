@@ -47,9 +47,10 @@ def tcpServerComunication(add):
                 sockt.settimeout(2.00)
                 dados, addr = sockt.recvfrom(1024)
                 
-                print(f'numero de sequencia: {dados.decode()[0]}')
-                print(f'numero esperado: {dados.decode()[1]}')
-                print(f'ACK: {dados.decode()[2]}')            
+                print('\n')
+                print(f'numero de sequencia SERVIDOR: {dados.decode()[0]}')
+                print(f'numero esperado servidor: {dados.decode()[1]}')
+                print(f'ACK servidor: {dados.decode()[2]}')            
 
                 if dados.decode()[2] == newResquest[1]:
                     tentar = 3
@@ -100,7 +101,7 @@ def tcpServerComunication(add):
 #### dnsServerComunication() faz a comunicação cliente/dns ###
 def dnsServerComunication():
 
-    nomeDNS = '192.168.0.15' #LUANA
+    nomeDNS = '192.168.0.13' #LUANA
     portaDNS = 12000
 
     print('Digite site:')

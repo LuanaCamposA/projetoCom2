@@ -45,7 +45,7 @@ datas = [
 def dnsCom():
 
     while True:
-        nomeDNS = '192.168.0.15'
+        nomeDNS = '192.168.0.13'
         portaDNS = 12000
 
         print('Comunicando com DNS')
@@ -59,7 +59,7 @@ def dnsCom():
 
 ######### COMUNICAÇÃO COM O UDP CLIENT ##############
 def clientCom():
-    serverHost = '192.168.0.15' #cin lua
+    serverHost = '192.168.0.13' #cin lua
     serverPort = 12001
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -69,6 +69,7 @@ def clientCom():
 
     numSeq = 5
     numExp = numSeq + 1
+    i = 0
 
     while True:
         sentence, addr = sock.recvfrom(1024)
@@ -77,15 +78,20 @@ def clientCom():
         
         if not sentence: break  
          ##acho q pode tirar essa parte aqui 
-        print(f'numero de sequencia: {sentence.decode()[0]}')
-        print(f'numero esperado: {sentence.decode()[1]}')
-        print(f'ACK: {sentence.decode()[2]}')             
-
+        print(f'numero de sequencia cliente: {sentence.decode()[0]}')
+        print(f'numero esperado cliente: {sentence.decode()[1]}')
+        if i == 0:
+                print(f'ACK : x')
+                AKC = sentence.decode()[1]
+                newResponse = str(numSeq) + str(numExp) + AKC
+        else: 
+                print(f'ACK : {sentence.decode()[2]}')        
+                AKC = sentence.decode()[1]
+                numSeq = int(sentence.decode()[2])
+                numExp = numSeq + 1
+                newResponse = str(numSeq) + str(numExp) + AKC 
         
-        AKC = sentence.decode()[1]
-        newResponse = str(numSeq) + str(numExp) + AKC
-        numSeq = int(sentence.decode()[2])
-        numExp = numSeq + 1
+        
         
         #DECODIFICAÇÃO DA SOLICITAÇÃO
         ####TA DANDO MERDA AQUI
@@ -126,6 +132,8 @@ def clientCom():
             newResponse += response
             newResponse = bytes(newResponse, "utf-8")
             sock.sendto(newResponse, addr)
+        
+        i += 1
 
         
 
